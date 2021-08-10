@@ -1,37 +1,51 @@
-#define trigPin 12
-#define echoPin 13
-int Buzzer = 8; // Connect buzzer pin to 8
-int ledPin= 6;  //Connect LEd pin to 6
-int duration, distance; //to measure the distance and time taken 
+// defines pins numbers
+const int trigPin = 9;
+const int echoPin = 10;
+const int buzzer = 11;
+const int ledPin = 13;
+
+// defines variables
+long duration;
+int distance;
+int safetyDistance;
+
 
 void setup() {
-        Serial.begin (9600); 
-        //Define the output and input objects(devices)
-        pinMode(trigPin, OUTPUT); 
-        pinMode(echoPin, INPUT);
-        pinMode(Buzzer, OUTPUT);
-        pinMode(ledPin, OUTPUT);
+pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+pinMode(buzzer, OUTPUT);
+pinMode(ledPin, OUTPUT);
+Serial.begin(9600); // Starts the serial communication
 }
 
-void loop() {
 
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-    duration = pulseIn(echoPin, HIGH);
-    distance = (duration/2) / 29.1;
-    //when distance is greater than or equal to 200 OR less than or equal to 0,the buzzer and LED are off
-  if (distance >= 200 || distance <= 0) 
-        {
-        Serial.println("no object detected");
-        digitalWrite(Buzzer,LOW);
-        digitalWrite(ledPin,LOW);
-        }
-  else {
-        Serial.println("object detected \n");
-        Serial.print("distance= ");              
-        Serial.print(distance);        //prints the distance if it is between the range 0 to 200
-        tone(Buzzer,400);              // play tone of 400Hz for 500 ms
-        digitalWrite(ledPin,HIGH);
-  }
+void loop() {
+// Clears the trigPin
+digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+
+// Sets the trigPin on HIGH state for 10 micro seconds
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+
+// Reads the echoPin, returns the sound wave travel time in microseconds
+duration = pulseIn(echoPin, HIGH);
+
+// Calculating the distance
+distance= duration*0.034/2;
+
+safetyDistance = distance;
+if (safetyDistance <= 50){
+  digitalWrite(buzzer, HIGH);
+  digitalWrite(ledPin, HIGH);
+}
+else{
+  digitalWrite(buzzer, LOW);
+  digitalWrite(ledPin, LOW);
+}
+
+// Prints the distance on the Serial Monitor
+Serial.print("Distance: ");
+Serial.println(distance);
 }
